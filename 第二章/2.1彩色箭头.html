@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2.1彩色箭头</title>
+</head>
+
+<body>
+    <script src="../three.min.js"></script>
+    <script>
+        let scene,
+            camera,
+            renderer,
+            skeleton,
+            skin,
+            person,
+            w = 500,
+            h = 300;
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100)
+        camera.position.set(0, 0, 30)
+        renderer = new THREE.WebGLRenderer()
+        renderer.setSize(w, h)
+        document.body.appendChild(renderer.domElement)
+
+        function createPerson() {
+            let point1 = new THREE.Vector3(-10, 0, 0)
+            let point2 = new THREE.Vector3(0, 10, 0)
+            let point3 = new THREE.Vector3(10, 0, 0)
+            let color1 = new THREE.Color(0xff0000)
+            let color2 = new THREE.Color(0x0000ff)
+            skeleton = new THREE.Geometry()
+            skeleton.vertices.push(point1, point2, point3)
+            skeleton.colors.push(color1, color2, color1)
+            skin = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors })
+            person = new THREE.Line(skeleton, skin)
+        }
+        createPerson()
+        scene.add(person)
+        renderer.render(scene, camera)
+
+    </script>
+</body>
+
+</html>
