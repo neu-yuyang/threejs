@@ -18,11 +18,13 @@
             skin,
             person,
             w = 500,
-            h = 400;
+            h = 300;
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 300);
-        camera.position.set(0, 0, 30);
-        renderer = new THREE.WebGLRenderer(w, h)
+        camera.position.set(0, 0, 200);
+        renderer = new THREE.WebGLRenderer()
+        renderer.setSize(w, h)
+        document.body.appendChild(renderer.domElement)
 
         function createPerson() {
             let p1 = new THREE.Vector3(-100, 0, 0)
@@ -30,11 +32,18 @@
             skeleton = new THREE.Geometry()
             skeleton.vertices.push(p1, p2)
             skin = new THREE.LineBasicMaterial({ color: 0xffffff })
-            let line = new THREE.Line(skeleton, skin)
-            for (let i = 0; i < 20; i++) {
-                line.rotation.z = 90 * Math.PI / 180
+            for (let i = 0; i <= 20; i++) {
+                let line = new THREE.Line(skeleton, skin)
+                line.position.y = i * 10 - 100
+                scene.add(line)
+                let line1 = new THREE.Line(skeleton, skin)
+                line1.rotation.z = 90 * Math.PI / 180
+                line1.position.x = i * 10 - 100
+                scene.add(line1)
             }
         }
+        createPerson()
+        renderer.render(scene, camera)
     </script>
 </body>
 
