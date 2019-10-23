@@ -8,7 +8,7 @@
     <title>5.2时钟canvas</title>
     <style>
         canvas {
-            background-color: #f5f5f5;
+            /* background-color: #f5f5f5; */
         }
     </style>
 </head>
@@ -23,7 +23,6 @@
             let ctx = canvas.getContext('2d')
             if (ctx) {
                 let timerId = null
-                let frameRate = 60
                 // 定义一个绘画的对象
                 function CavObj() {
                     this.x = 0
@@ -130,7 +129,7 @@
                     cacheArr[i].borderColor = 'orange'
                 }
 
-                timerId = setInterval(function () {
+                function initClock() {
                     // 清楚画布
                     ctx.clearRect(0, 0, 200, 200)
                     // 填充画布背景色
@@ -148,17 +147,14 @@
                     seconds.rotation = date.getSeconds() * 6
                     seconds.update()
                     center.update()
-
+                }
+                initClock()
+                timerId = setInterval(function () {
+                    initClock()
                 }, 1000)
-
-
-
             } else {
                 alert('您的浏览器不支持Canvas无法预览.\n跟我一起说："Fuck Internet Exploer!"');
             }
-
-
-
 
             document.body.appendChild(canvas)
         }
