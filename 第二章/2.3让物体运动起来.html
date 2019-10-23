@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>运动的物体</title>
+</head>
+
+<body>
+    <script src="../three.min.js"></script>
+    <script>
+        let scene,
+            camera,
+            renderer,
+            skeleton,
+            skin,
+            Body,
+            w = 600,
+            h = 400;
+        scene = new THREE.Scene()
+        camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 500)
+        camera.position.z = 50
+        renderer = new THREE.WebGLRenderer()
+        renderer.setSize(w, h)
+        document.body.appendChild(renderer.domElement)
+
+        function createBody() {
+            skeleton = new THREE.BoxGeometry(10, 10, 10)
+            skin = new THREE.MeshBasicMaterial({ color: 0xff0000 })
+            Body = new THREE.Mesh(skeleton, skin)
+        }
+        createBody()
+        scene.add(Body)
+        // renderer.render(scene, camera)
+        function animate() {
+            Body.rotation.z += 60 * Math.PI / 180
+            renderer.render(scene, camera)
+            requestAnimationFrame(animate)
+        }
+        animate()
+    </script>
+</body>
+
+</html>
