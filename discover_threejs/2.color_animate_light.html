@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>hello scene</title>
+    <style>
+        .container {
+            width: 600px;
+            height: 500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container"></div>
+    <script src="three.js"></script>
+    <script>
+        let container = document.querySelector('.container'),
+            scene,
+            camera,
+            renderer,
+            geometry,
+            material,
+            // material1,
+            mesh,
+            // mesh1,
+            light,
+            w = container.clientWidth,
+            h = container.clientHeight,
+            fov = 60,
+            aspect = w / h,
+            near = 0.1,
+            far = 100;
+
+        function init() {
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+            camera.position.set(0, 0, 10)
+            renderer = new THREE.WebGLRenderer({ antialias: true })
+            renderer.setSize(w, h)
+            renderer.setPixelRatio(window.devicePixelRatio)
+            container.appendChild(renderer.domElement)
+
+            geometry = new THREE.BoxBufferGeometry(2, 2, 2)
+            // 标准材质
+            material = new THREE.MeshStandardMaterial({ color: 0x800080 })
+            mesh = new THREE.Mesh(geometry, material)
+            mesh.position.set(0, 0, 0)
+            // 基础材质
+            // material1 = new THREE.MeshBasicMaterial({ color: 0x800080 })
+            // mesh1 = new THREE.Mesh(geometry, material1)
+            // mesh1.position.set(2, 0, 0)
+
+            light = new THREE.DirectionalLight(0xffffff, 5.0)
+            light.position.set(10, 10, 10)
+
+            scene.add(light)
+            scene.add(mesh)
+            // scene.add(mesh1)
+        }
+        // function animate() {
+
+        //     // mesh1.rotation.x += 0.01
+        //     // mesh1.rotation.y += 0.01
+        //     // mesh1.rotation.z += 0.01
+        //     renderer.render(scene, camera)
+        //     requestAnimationFrame(animate)
+        // }
+        // 控制动画
+        function update() {
+            mesh.rotation.x += 0.01
+            mesh.rotation.y += 0.01
+            mesh.rotation.z += 0.01
+        }
+        // 控制渲染
+        function render() {
+            renderer.render(scene, camera)
+        }
+        init()
+        // 控制循环，requestAnimationFrame在VR设备中不兼容
+        renderer.setAnimationLoop(() => {
+            update()
+            render()
+        })
+        // animate()
+    </script>
+</body>
+
+</html>

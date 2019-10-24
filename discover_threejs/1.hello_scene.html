@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>hello scene</title>
+    <style>
+        .container {
+            width: 600px;
+            height: 500px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container"></div>
+    <script src="three.js"></script>
+    <script>
+        let container = document.querySelector('.container')
+        let scene,
+            camera,
+            renderer,
+            geometry,
+            material,
+            mesh,
+            w = container.clientWidth,
+            h = container.clientHeight,
+            fov = 45,
+            aspect = w / h,
+            near = 0.1,
+            far = 100;
+        scene = new THREE.Scene()
+        scene.background = new THREE.Color('skyblue')
+        camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+        camera.position.set(0, 0, 10)
+        renderer = new THREE.WebGLRenderer()
+        renderer.setSize(w, h)
+        renderer.setPixelRatio(window.devicePixelRatio)
+        container.appendChild(renderer.domElement)
+
+        geometry = new THREE.BoxBufferGeometry(2, 2, 2)
+        // 只有MeshBasicMaterial不需要光源，其他材质都需要光源的
+        material = new THREE.MeshBasicMaterial()
+        mesh = new THREE.Mesh(geometry, material)
+
+        scene.add(mesh)
+        renderer.render(scene, camera)
+    </script>
+</body>
+
+</html>
