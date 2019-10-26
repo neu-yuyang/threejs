@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>5.control_camera</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene_container"></div>
+    <script src="./three.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script>
+        let container = document.querySelector('.scene_container'),
+            scene,
+            camera,
+            renderer,
+            geometry,
+            material,
+            mesh,
+            textureLoader,
+            texture,
+            controls,
+            w = window.innerWidth,
+            h = window.innerHeight;
+
+        function init() {
+            // 1.初始化scene
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            createCamera()
+            createRenderer()
+            initLight()
+            createMeshes()
+            createControls()
+            renderer.setAnimationLoop(() => {
+                update()
+                render()
+            })
+        }
+        function createCamera() {
+            camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100)
+            camera.position.set(7, 5, 5)
+        }
+        function createRenderer() {
+            // 渲染器是否抗锯齿：antialias
+            renderer = new THREE.WebGLRenderer({ antialias: true })
+            renderer.setSize(w, h)
+            renderer.setPixelRatio(window.devicePixelRatio)
+            renderer.gammaFactor = 2.2
+            renderer.gammaOutput = true
+            container.appendChild(renderer.domElement)
+        }
+
+        function createMeshes() {
+            let train = new THREE.Group()
+            scene.add(train)
+            let geometries = createGeometries()
+            let materials = createMaterials()
+            // 鼻子
+            let nose = new THREE.Mesh(geometries.nose, materials.body)
+            nose.rotation.x = Math.PI / 2
+            // 车身
+            let cabin = new THREE.Mesh(geometries.cabin, materials.body)
+            cabin.position.set(0, 0.4, -2.5)
+            // 烟囱
+            let chimney = new THREE.Mesh(geometries.chimney, materials.wheel)
+            chimney.position.set(0, 0.9, 0.8)
+            // 轮子
+            let smallWheel = new THREE.Mesh(geometries.wheels, materials.wheel)
+            smallWheel.position.set(0, -0.6, 0)
+            let smallWheel1 = smallWheel.clone()
+            smallWheel1.position.set(0, -0.6, 1)
+            let smallWheel2 = smallWheel.clone()
+            smallWheel2.position.set(0, -0.6, -1)
+            let bigWheel = smallWheel.clone()
+            bigWheel.scale.set(1, 2, 2)
+            bigWheel.position.set(0, -0.2, -2.5)
+            train.add(nose)
+            train.add(cabin)
+            train.add(chimney)
+            train.add(smallWheel)
+            train.add(smallWheel1)
+            train.add(smallWheel2)
+            train.add(bigWheel)
+        }
+        function createGeometries() {
+            let nose = new THREE.CylinderBufferGeometry(0.8, 0.8, 3, 12)
+            let cabin = new THREE.BoxBufferGeometry(1.8, 2.5, 2)
+            let chimney = new THREE.CylinderBufferGeometry(0.3, 0.1, 0.5)
+            let wheels = new THREE.CylinderBufferGeometry(0.4, 0.4, 2.2, 16)
+            wheels.rotateZ(Math.PI / 2)
+            return {
+                nose,
+                cabin,
+                chimney,
+                wheels
+            }
+        }
+        function createMaterials() {
+            let body = new THREE.MeshStandardMaterial({
+                color: 0xff3333,
+                flatShading: true
+            })
+            body.color.convertSRGBToLinear()
+            let wheel = new THREE.MeshStandardMaterial({
+                color: 0x333333,
+                flatShading: false
+            })
+            wheel.color.convertSRGBToLinear()
+            return {
+                body,
+                wheel
+            }
+        }
+
+        function initLight() {
+            // 一般用这个光HemisphereLight来模拟真实世界的光
+            let ambientLight = new THREE.HemisphereLight(
+                // 0xffffff,  //sky color
+                // 0x202020,  //ground color
+                // 5  //intensity
+            )
+            let mainLight = new THREE.DirectionalLight(0xffffff, 5.0)
+            mainLight.position.set(7, 5, -5)
+            scene.add(mainLight, ambientLight)
+        }
+        function createControls() {
+            controls = new THREE.OrbitControls(camera, container)
+        }
+        function update() {
+            // mesh.rotation.x += 0.01
+            // mesh.rotation.y += 0.01
+            // mesh.rotation.z += 0.01
+        }
+        function render() {
+            renderer.render(scene, camera)
+        }
+        init()
+        window.addEventListener('resize', onWindowResize)
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+    </script>
+</body>
+
+</html>

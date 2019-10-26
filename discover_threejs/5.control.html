@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>5.control_camera</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene_container"></div>
+    <script src="./three.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script>
+        let container = document.querySelector('.scene_container'),
+            scene,
+            camera,
+            renderer,
+            geometry,
+            material,
+            mesh,
+            textureLoader,
+            texture,
+            controls,
+            w = window.innerWidth,
+            h = window.innerHeight;
+
+        function init() {
+            // 1.初始化scene
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            createCamera()
+            createRenderer()
+            initLight()
+            createMeshes()
+            createControls()
+            renderer.setAnimationLoop(() => {
+                update()
+                render()
+            })
+        }
+        function createCamera() {
+            camera = new THREE.PerspectiveCamera(60, w / h, 0.1, 100)
+            camera.position.set(0, 0, 10)
+        }
+        function createRenderer() {
+            // 渲染器是否抗锯齿：antialias
+            renderer = new THREE.WebGLRenderer({ antialias: true })
+            renderer.setSize(w, h)
+            renderer.setPixelRatio(window.devicePixelRatio)
+            renderer.gammaFactor = 2.2
+            renderer.gammaOutput = true
+            container.appendChild(renderer.domElement)
+        }
+        function createMeshes() {
+            geometry = new THREE.BoxBufferGeometry(2, 2, 2)
+            textureLoader = new THREE.TextureLoader()
+            texture = textureLoader.load('textures/01ptg.jfif')
+            material = new THREE.MeshStandardMaterial({ map: texture })
+            mesh = new THREE.Mesh(geometry, material)
+            scene.add(mesh)
+        }
+        function initLight() {
+            // 一般用这个光HemisphereLight来模拟真实世界的光
+            let ambientLight = new THREE.HemisphereLight(
+                // 0xddeedd,  //sky color
+                // 0x202020,  //ground color
+                // 5  //intensity
+            )
+            let mainLight = new THREE.DirectionalLight(0xffffff, 3.0)
+            mainLight.position.set(10, 10, 10)
+            scene.add(mainLight, ambientLight)
+        }
+        function createControls() {
+            controls = new THREE.OrbitControls(camera, container)
+        }
+        function update() {
+            // mesh.rotation.x += 0.01
+            // mesh.rotation.y += 0.01
+            // mesh.rotation.z += 0.01
+        }
+        function render() {
+            renderer.render(scene, camera)
+        }
+        init()
+        window.addEventListener('resize', onWindowResize)
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+    </script>
+</body>
+
+</html>

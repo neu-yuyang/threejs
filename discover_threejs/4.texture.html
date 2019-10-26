@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>hello scene</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .tips {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tips">
+        <h3>1.load a texture with textureloader</h3>
+        <h3>2.set the texture's parameters</h3>
+        <h3>3.add the texture to the material's color map slot</h3>
+    </div>
+    <div class="container"></div>
+    <script src="three.js"></script>
+    <script>
+        let container = document.querySelector('.container'),
+            scene,
+            camera,
+            renderer,
+            geometry,
+            material,
+            mesh,
+            light,
+            textureLoader,
+            texture,
+            w = window.innerWidth,
+            h = window.innerHeight,
+            fov = 60,
+            aspect = w / h,
+            near = 0.1,
+            far = 100;
+
+        function init() {
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+            camera.position.set(0, 0, 10)
+            // 是否对边缘进行抗锯齿处理antialias
+            renderer = new THREE.WebGLRenderer({ antialias: true })
+            renderer.setSize(w, h)
+            // 匹配设备
+            renderer.setPixelRatio(window.devicePixelRatio)
+            // 设置gamma矫正颜色
+            renderer.gammaFactor = 2.2
+            renderer.gammaOutput = true
+            container.appendChild(renderer.domElement)
+
+            geometry = new THREE.BoxBufferGeometry(2, 2, 2)
+            // 纹理
+            textureLoader = new THREE.TextureLoader()
+            texture = textureLoader.load('textures/01ptg.jfif')
+            texture.encoding = THREE.sRGBEncoding
+            texture.anisotropy = 16
+            // 标准材质
+            material = new THREE.MeshStandardMaterial({ map: texture })
+            mesh = new THREE.Mesh(geometry, material)
+            mesh.position.set(0, 0, 0)
+
+            light = new THREE.DirectionalLight(0xffffff, 3.0)
+            light.position.set(10, 10, 10)
+
+            scene.add(light)
+            scene.add(mesh)
+        }
+
+        // 控制动画
+        function update() {
+            mesh.rotation.x += 0.01
+            mesh.rotation.y += 0.01
+            mesh.rotation.z += 0.01
+        }
+        // 控制渲染
+        function render() {
+            renderer.render(scene, camera)
+        }
+
+        init()
+        // 控制循环，requestAnimationFrame在VR设备中不兼容
+        renderer.setAnimationLoop(() => {
+            update()
+            render()
+        })
+        window.addEventListener('resize', handleWindowResize)
+        function handleWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+    </script>
+</body>
+
+</html>
