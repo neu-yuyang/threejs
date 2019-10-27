@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>7.load_models</title>
+    <style>
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene_container"></div>
+    <script src="./three.js"></script>
+    <script src="./OrbitControls.js"></script>
+    <script src="./GLTFLoader.js"></script>
+    <script>
+        let container = document.querySelector('.scene_container'),
+            scene,
+            camera,
+            renderer,
+            mesh,
+            mixers = [],
+            controls,
+            w = window.innerWidth,
+            h = window.innerHeight,
+            clock = new THREE.Clock();
+
+        function init() {
+            // 1.初始化scene
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            createCamera()
+            createRenderer()
+            initLight()
+            createControls()
+            loadModels()
+            renderer.setAnimationLoop(() => {
+                update()
+                render()
+            })
+        }
+        function createCamera() {
+            camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 10000)
+            camera.position.set(140, 100, 100)
+        }
+        function createRenderer() {
+            // 渲染器是否抗锯齿：antialias
+            renderer = new THREE.WebGLRenderer({ antialias: true })
+            renderer.setSize(w, h)
+            renderer.setPixelRatio(window.devicePixelRatio)
+            renderer.gammaFactor = 2.2
+            renderer.gammaOutput = true
+            container.appendChild(renderer.domElement)
+        }
+        function initLight() {
+            // 一般用这个光HemisphereLight来模拟真实世界的光
+            let ambientLight = new THREE.HemisphereLight(
+                // 0xffffff,  //sky color
+                // 0x202020,  //ground color
+                // 5  //intensity
+            )
+            let mainLight = new THREE.DirectionalLight(0xffffff, 5.0)
+            mainLight.position.set(7, 5, -5)
+            scene.add(mainLight, ambientLight)
+        }
+        function loadModels() {
+            // 创建一个gltf加载器
+            let loader = new THREE.GLTFLoader()
+            // 定义加载函数
+            let onload = (gltf, position) => {
+                // 获取模型
+                let model = gltf.scene.children[0]
+                // 定义模型位置
+                model.position.copy(position)
+                // 获取动画
+                let animation = gltf.animations[0]
+                // 把模型和动画剪辑混合
+                let mixer = new THREE.AnimationMixer(model)
+                mixers.push(mixer)
+                let action = mixer.clipAction(animation)
+                action.play()
+                scene.add(model)
+            }
+            // 加载失败函数
+            let onerror = (error) => {
+                console.log(error);
+            }
+            // 加载进程函数
+            let onprogress = (value) => {
+                // console.log(value);
+            }
+            // 加载模型1
+            let parrotPosition = new THREE.Vector3(0, 0, 20)
+            loader.load('./models/Parrot.glb', glft => onload(glft, parrotPosition), onerror, onprogress)
+            // 加载模型2
+            let flamingoPosition = new THREE.Vector3(75, 75, -10)
+            loader.load('./models/Flamingo.glb', glft => onload(glft, flamingoPosition), onerror, onprogress)
+            // 加载模型3
+            let storkPosition = new THREE.Vector3(-40, -40, 40)
+            loader.load('./models/Stork.glb', glft => onload(glft, storkPosition), onerror, onprogress)
+        }
+        function createControls() {
+            controls = new THREE.OrbitControls(camera, container)
+        }
+        function update() {
+            let delta = clock.getDelta()
+            for (let mixer of mixers) {
+                mixer.update(delta)
+            }
+        }
+        function render() {
+            renderer.render(scene, camera)
+        }
+        init()
+        window.addEventListener('resize', onWindowResize)
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(window.innerWidth, window.innerHeight)
+        }
+    </script>
+</body>
+
+</html>
