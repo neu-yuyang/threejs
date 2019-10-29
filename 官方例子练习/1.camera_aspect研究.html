@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>camera_aspect研究</title>
+</head>
+
+<body>
+    <script type="module">
+        // 一般camera的aspect设置为renderer的宽/高，这样就能不拉伸的把物体投影到renderer的dom中
+        // 如果aspect小于renderer的宽/高，那么物体的宽度方向将被压缩，其他情况同理
+        // 关于camera视景体范围的解读：
+        // fov：决定了y轴方向上的范围
+        // near,far：决定了z轴方向上的范围
+        // aspect：决定了物体是否被拉伸
+        // 那么x轴方向上的范围如何确定呢？...
+        // 应该是不需要我们来确定，因为给了fov，near,far，以及renderer的宽、高，则可以唯一的确定视景体x轴方向上的范围了
+        import * as THREE from '../build/three.module.js'
+
+        let scene,
+            camera,
+            renderer;
+        let geometry,
+            material,
+            mesh,
+            light,
+            light1;
+        let w = window.innerWidth / 2,
+            h = window.innerHeight / 2;
+
+        init()
+        function init() {
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
+            camera.position.z = 10
+
+            geometry = new THREE.SphereBufferGeometry(2, 8, 8)
+            material = new THREE.MeshStandardMaterial({ color: 0x0000ff })
+            mesh = new THREE.Mesh(geometry, material)
+            scene.add(mesh)
+
+            light = new THREE.AmbientLight(0xffffff)
+            light.position.set(0, 0, 4)
+            scene.add(light)
+
+            light1 = new THREE.DirectionalLight(0xff00ff)
+            light1.position.set(4, 4, 4)
+            scene.add(light1)
+
+            renderer = new THREE.WebGLRenderer()
+            renderer.setSize(w, h)
+            document.body.appendChild(renderer.domElement)
+            renderer.render(scene, camera)
+        }
+    </script>
+</body>
+
+</html>

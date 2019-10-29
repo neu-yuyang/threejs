@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2.texture_uvmapping研究</title>
+</head>
+
+<body>
+    <div class="container"></div>
+    <script type="module">
+        // 结论：几何体，有几个面，用几张纹理贴图
+
+        import * as THREE from '../build/three.module.js'
+        import { OrbitControls } from './jsm/OrbitControls.js'
+
+        let container = document.querySelector('.container')
+        let scene,
+            camera,
+            renderer;
+        let w = window.innerWidth - 20,
+            h = window.innerHeight - 20;
+
+        init()
+        animate()
+        function init() {
+            scene = new THREE.Scene()
+            scene.background = new THREE.Color('skyblue')
+            camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
+            camera.position.set(10, 10, 10)
+            camera.lookAt(0, 0, 0)
+            renderer = new THREE.WebGLRenderer()
+            renderer.setSize(w, h)
+            container.appendChild(renderer.domElement)
+
+            let axesHelper = new THREE.AxesHelper(10);
+            scene.add(axesHelper);
+            // 添加环境光
+            let ambientLight = new THREE.AmbientLight(0xcccccc)
+            scene.add(ambientLight)
+
+            // 添加点光源，并置于camera处
+            let pointLight = new THREE.PointLight(0xffffff)
+            camera.add(pointLight)
+            scene.add(camera)
+
+            // 加载纹理
+            let map = new THREE.TextureLoader().load('textures/uv_grid_opengl.jpg')
+            map.wrapS = map.wrapT = THREE.RepeatWrapping;
+            map.anisotropy = 16;
+            let material = new THREE.MeshPhongMaterial({
+                map: map
+                // color: 0xff0000
+            })
+            // 盒型，每个面用一张纹理贴图
+            // let geometry = new THREE.BoxBufferGeometry(8, 4, 4)
+            // 球形，只用一张纹理贴图
+            // let geometry = new THREE.SphereBufferGeometry(4, 16, 16)
+            // 柱体，上下面各用一张，侧面用一张
+            let geometry = new THREE.CylinderBufferGeometry(4, 6, 10)
+            let mesh = new THREE.Mesh(geometry, material)
+            scene.add(mesh)
+            let control = new OrbitControls(camera, container)
+        }
+        // 一个超级大的坑，没有这个函数，纹理和控制器都不起作用
+        function animate() {
+            renderer.render(scene, camera)
+            requestAnimationFrame(animate)
+        }
+    </script>
+</body>
+
+</html>
